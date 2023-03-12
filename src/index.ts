@@ -16,7 +16,7 @@ dotenv.config();
 const init = async () => {
   const server = HapiServer({
     port: process.env.PORT ? parseInt(process.env.PORT) : 3000,
-    host: "localhost",
+    host: process.env.HOST ? process.env.HOST : "localhost",
     query: {
       parser: (query) => Qs.parse(query as any),
     },
