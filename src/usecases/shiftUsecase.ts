@@ -1,9 +1,11 @@
 import * as shiftRepository from "../database/default/repository/shiftRepository";
-import { FindConditions, FindManyOptions, FindOneOptions } from "typeorm";
+import { Between, FindConditions, FindManyOptions, FindOneOptions, In } from "typeorm";
+import moment from "moment";
 import Shift from "../database/default/entity/shift";
-import { ICreateShift, IUpdateShift } from "../shared/interfaces";
+import { ICreateShift, IPublishShift, IUpdateShift } from "../shared/interfaces";
+import { findWeeklyShift } from "../shared/helper";
 
-export const find = async (opts: FindManyOptions<Shift>): Promise<Shift[]> => {
+export const find = async (opts: FindManyOptions<Shift>): Promise<[Shift[], number]> => {
   return shiftRepository.find(opts);
 };
 
@@ -35,6 +37,20 @@ export const updateById = async (
   return shiftRepository.updateById(id, {
     ...payload,
   });
+};
+
+export const publishShiftByWeekId = async (
+  payload: IPublishShift
+): Promise<[Shift[], number]> => {
+  const [firstDayOfWeek, lastDayOfWeek] = findWeeklyShift(moment.utc(payload.weekId).toDate())
+
+  return shiftRepository.update(
+    { 
+      date: Between(firstDayOfWeek, lastDayOfWeek) 
+    },
+    {
+      isPublished: true,
+    });
 };
 
 export const deleteById = async (id: string | string[]) => {

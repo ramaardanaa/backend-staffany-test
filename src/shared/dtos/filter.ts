@@ -11,4 +11,5 @@ export const filterSchema = Joi.object({
   relations: Joi.array().items(Joi.string()),
   where: Joi.object(),
   order: Joi.object(),
+  weekId: Joi.date()
 });
